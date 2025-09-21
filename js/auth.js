@@ -8,7 +8,8 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   GoogleAuthProvider, 
-  signInWithPopup 
+  signInWithPopup,
+  onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
 
 // Import UI utility functions
@@ -101,8 +102,14 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-function getCurrentUser() {
-    return userProfile;
+// Promise-based function to get current user
+export function getCurrentUser() {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe(); // Unsubscribe immediately to avoid memory leaks
+            resolve(user); // Resolve with user object or null
+        });
+    });
 }
 
 function isUserAuthenticated() {

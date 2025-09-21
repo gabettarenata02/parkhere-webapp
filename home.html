@@ -3,14 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParkHere - Dashboard</title>
+    <title>ParkHere - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-    <h1>ParkHere Dashboard</h1>
+<body class="home-body">
+    <!-- Main Container -->
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <!-- Header Section -->
+                <header class="home-header">
+                    <!-- Location Bar -->
+                    <div class="location-bar">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="location-info d-flex align-items-center">
+                                <i class="ph ph-map-pin me-2"></i>
+                                <span>Pondok Labu, Jakarta Selatan</span>
+                            </div>
+                            <div class="header-actions d-flex align-items-center">
+                                <i class="ph ph-eye me-3"></i>
+                                <i class="ph ph-question"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Greeting & Vehicle Status Section -->
+                    <div class="greeting-section">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="greeting-info">
+                                <h1 class="greeting-title">Hey, Amy!</h1>
+                                <p class="greeting-subtitle">Are you looking for parking?</p>
+                            </div>
+                            <div class="vehicle-status">
+                                <!-- SHOW THIS IF NO VEHICLE IS ADDED -->
+                                <button class="btn btn-add-vehicle-header" id="addVehicleBtn">
+                                    <i class="ph ph-plus me-2"></i>
+                                    Add Vehicle
+                                </button>
+                                
+                                <!-- SHOW THIS IF A VEHICLE IS SELECTED -->
+                                <div class="selected-vehicle d-none" id="selectedVehicle">
+                                    <div class="vehicle-info-card active-vehicle-display">
+                                        <div class="vehicle-info">
+                                            <span class="vehicle-type">Car</span>
+                                            <div class="vehicle-plate">B 1234 IMK</div>
+                                        </div>
+                                        <i class="ph ph-caret-right ms-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter Bar -->
+                    <div class="search-section mb-4">
+                        <div class="input-group search-input-group">
+                            <span class="input-group-text search-icon">
+                                <i class="ph ph-magnifying-glass"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-dark search-input" placeholder="Search">
+                            <button class="btn btn-filter">
+                                <i class="ph ph-sliders"></i>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Main Content Section -->
+                <div class="home-main">
+                    <!-- Category Selector -->
+                    <section class="category-section mb-4">
+                        <h2 class="section-title">Category</h2>
+                        <div class="category-buttons">
+                            <button class="btn btn-category active" data-vehicle="car">
+                                <i class="ph ph-car me-2"></i>
+                                Car
+                            </button>
+                            <button class="btn btn-category" data-vehicle="motorcycle">
+                                <i class="ph ph-motorcycle me-2"></i>
+                                Motorcycle
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Spot near you -->
+                    <section class="spots-section mb-4">
+                        <h2 class="section-title">Spot near you</h2>
+                        <div class="parking-spots-list">
+                            <!-- Parking Spot Card 1 -->
+                            <div class="parking-spot-card">
+                                <div class="spot-image">
+                                    <div class="spot-image-placeholder"></div>
+                                </div>
+                                <div class="spot-details">
+                                    <h3 class="spot-name">One Belpark Mall</h3>
+                                    <div class="spot-rating">
+                                        <i class="ph ph-star"></i>
+                                        <span>4.5</span>
+                                        <span class="review-count">(850+ Reviews)</span>
+                                    </div>
+                                    <div class="spot-price">Rp5000/hour</div>
+                                    <div class="spot-distance">
+                                        <i class="ph ph-map-pin-line me-1"></i>
+                                        <span>700 Meter</span>
+                                    </div>
+                                    <div class="spot-hours">
+                                        <i class="ph ph-clock me-1"></i>
+                                        <span>08:00 - 23:00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Parking Spot Card 2 -->
+                            <div class="parking-spot-card">
+                                <div class="spot-image">
+                                    <div class="spot-image-placeholder"></div>
+                                </div>
+                                <div class="spot-details">
+                                    <h3 class="spot-name">RS Fatmawati</h3>
+                                    <div class="spot-rating">
+                                        <i class="ph ph-star"></i>
+                                        <span>4.5</span>
+                                        <span class="review-count">(870+ Reviews)</span>
+                                    </div>
+                                    <div class="spot-price">Rp5000/hour</div>
+                                    <div class="spot-distance">
+                                        <i class="ph ph-map-pin-line me-1"></i>
+                                        <span>1.1 KM</span>
+                                    </div>
+                                    <div class="spot-hours">
+                                        <i class="ph ph-clock me-1"></i>
+                                        <span>08:00 - 23:00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Parking Spot Card 3 -->
+                            <div class="parking-spot-card">
+                                <div class="spot-image">
+                                    <div class="spot-image-placeholder"></div>
+                                </div>
+                                <div class="spot-details">
+                                    <h3 class="spot-name">One Belpark Mall</h3>
+                                    <div class="spot-rating">
+                                        <i class="ph ph-star"></i>
+                                        <span>4.5</span>
+                                        <span class="review-count">(850+ Reviews)</span>
+                                    </div>
+                                    <div class="spot-price">Rp5000/hour</div>
+                                    <div class="spot-distance">
+                                        <i class="ph ph-map-pin-line me-1"></i>
+                                        <span>700 Meter</span>
+                                    </div>
+                                    <div class="spot-hours">
+                                        <i class="ph ph-clock me-1"></i>
+                                        <span>08:00 - 23:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <div class="nav-item">
+            <a href="home.html" class="nav-link active">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="riwayat.html" class="nav-link">
+                <i class="ph ph-receipt"></i>
+                <span>Transaction</span>
+            </a>
+        </div>
+        <div class="nav-item nav-scan">
+            <a href="#" class="nav-link nav-scan-btn">
+                <i class="ph ph-qr-code"></i>
+                <span>Scan</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="ph ph-bell"></i>
+                <span>Notification</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="profile.html" class="nav-link">
+                <i class="ph ph-user-circle"></i>
+                <span>Account</span>
+            </a>
+        </div>
+    </nav>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/map.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Category selection
+            const categoryButtons = document.querySelectorAll('.btn-category');
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    categoryButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Add vehicle button
+            const addVehicleBtn = document.getElementById('addVehicleBtn');
+            if (addVehicleBtn) {
+                addVehicleBtn.addEventListener('click', function() {
+                    window.location.href = 'add-vehicle.html';
+                });
+            }
+
+            // Selected vehicle click
+            const selectedVehicle = document.getElementById('selectedVehicle');
+            if (selectedVehicle) {
+                selectedVehicle.addEventListener('click', function() {
+                    window.location.href = 'vehicle-list.html';
+                });
+            }
+
+            // Parking spot cards click
+            const parkingCards = document.querySelectorAll('.parking-spot-card');
+            parkingCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    window.location.href = 'detail-parkir.html';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
