@@ -1,0 +1,750 @@
+/* ParkHere Web App Styles */
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Public Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+/* --- Login Page Styles --- */
+.login-body {
+    background-color: #1E1E1E;
+    min-height: 100vh;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.login-card {
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* --- Registration Page Styles --- */
+.register-body {
+    background-color: #1E1E1E;
+    min-height: 100vh;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.register-card {
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* --- Typography --- */
+.login-title {
+    font-family: 'Public Sans', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    color: #FFFFFF;
+    margin: 0;
+    text-align: left;
+}
+
+.login-title span {
+    display: block;
+}
+
+.register-title {
+    font-family: 'Public Sans', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    color: #FFFFFF;
+    margin: 0;
+    text-align: left;
+}
+
+.register-title span {
+    display: block;
+}
+
+/* --- Form Styles --- */
+.login-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* --- Input Group Styling --- */
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.input-group-text {
+    background-color: #2C2C2C;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    color: #FFFFFF;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.input-group-text i {
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Dark Mode Input Fields --- */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+    background-color: #2C2C2C;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    color: #FFFFFF;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: 'Public Sans', sans-serif;
+    height: auto;
+    min-height: 48px;
+    outline: none;
+    box-shadow: none;
+    flex: 1;
+}
+
+/* Input group form controls */
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+}
+
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus {
+    background-color: #2C2C2C;
+    border: 1px solid #F2C84F;
+    box-shadow: none;
+    color: #FFFFFF;
+    outline: none;
+    z-index: 3;
+}
+
+/* Focus state for input group */
+.input-group:focus-within .input-group-text {
+    border: 1px solid #F2C84F;
+    border-right: none;
+    z-index: 4;
+}
+
+.form-control::placeholder {
+    color: #A0A0A0;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.password-toggle {
+    background-color: #2C2C2C;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    color: #FFFFFF;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: background-color 0.3s ease;
+}
+
+.password-toggle:hover {
+    background-color: #404040;
+}
+
+.password-toggle i {
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Links --- */
+.forgot-password-link {
+    color: #FFFFFF;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    font-family: 'Public Sans', sans-serif;
+    font-weight: 400;
+}
+
+.forgot-password-link:hover {
+    color: #F2C84F;
+    text-decoration: underline;
+}
+
+/* --- Buttons --- */
+.btn-login {
+    background-color: #F2C84F;
+    border: none;
+    border-radius: 8px;
+    color: #000000;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: 'Public Sans', sans-serif;
+    padding: 0.75rem 1.5rem;
+    height: 48px;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    background-color: #E6B847;
+    color: #000000;
+    transform: translateY(-1px);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-signup {
+    background-color: #F2C84F;
+    border: none;
+    border-radius: 8px;
+    color: #000000;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: 'Public Sans', sans-serif;
+    padding: 0.75rem 1.5rem;
+    height: 48px;
+    transition: all 0.3s ease;
+}
+
+.btn-signup:hover {
+    background-color: #E6B847;
+    color: #000000;
+    transform: translateY(-1px);
+}
+
+.btn-signup:active {
+    transform: translateY(0);
+}
+
+.btn-google {
+    background-color: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    color: #1E1E1E;
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: 'Public Sans', sans-serif;
+    padding: 0.75rem 1.5rem;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-google:hover {
+    background-color: #F8F8F8;
+    color: #1E1E1E;
+    border-color: #D0D0D0;
+    transform: translateY(-1px);
+}
+
+.btn-google:active {
+    transform: translateY(0);
+}
+
+.btn-google i {
+    font-size: 1.2rem;
+    color: #4285F4;
+}
+
+/* --- Separator --- */
+.separator {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.separator-line {
+    flex: 1;
+    height: 1px;
+    background-color: #404040;
+    border: none;
+    margin: 0;
+}
+
+.separator-text {
+    color: #A0A0A0;
+    font-size: 0.9rem;
+    font-family: 'Public Sans', sans-serif;
+    padding: 0 1rem;
+    white-space: nowrap;
+}
+
+/* --- Sign Up Link --- */
+.signup-text {
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    font-family: 'Public Sans', sans-serif;
+    margin: 0;
+}
+
+.signup-link {
+    color: #FFFFFF;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.signup-link:hover {
+    color: #F2C84F;
+    text-decoration: underline;
+}
+
+/* --- Login Link --- */
+.login-text {
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    font-family: 'Public Sans', sans-serif;
+    margin: 0;
+}
+
+.login-link {
+    color: #FFFFFF;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.login-link:hover {
+    color: #F2C84F;
+    text-decoration: underline;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 576px) {
+    .login-card,
+    .register-card {
+        padding: 1.5rem !important;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .login-title,
+    .register-title {
+        font-size: 2.2rem;
+    }
+    
+    .form-control,
+    .input-group-text,
+    .password-toggle {
+        min-height: 44px;
+    }
+    
+    .btn-login,
+    .btn-signup,
+    .btn-google {
+        height: 44px;
+    }
+}
+
+@media (min-width: 768px) {
+    .login-card,
+    .register-card {
+        padding: 3rem !important;
+        border-radius: 0;
+    }
+    
+    .login-title,
+    .register-title {
+        font-size: 2.8rem;
+    }
+    
+    .form-control,
+    .input-group-text,
+    .password-toggle {
+        min-height: 52px;
+        font-size: 1.1rem;
+    }
+    
+    .btn-login,
+    .btn-signup,
+    .btn-google {
+        height: 52px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .login-card,
+    .register-card {
+        padding: 4rem !important;
+        border-radius: 0;
+    }
+    
+    .login-title,
+    .register-title {
+        font-size: 3.2rem;
+    }
+    
+    .form-control,
+    .input-group-text,
+    .password-toggle {
+        min-height: 56px;
+        font-size: 1.1rem;
+    }
+    
+    .btn-login,
+    .btn-signup,
+    .btn-google {
+        height: 56px;
+        font-size: 1.1rem;
+    }
+}
+
+/* --- Animation --- */
+.login-card,
+.register-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Focus States --- */
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus {
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #F2C84F;
+}
+
+.btn-login:focus,
+.btn-signup:focus,
+.btn-google:focus {
+    outline: 2px solid #F2C84F;
+    outline-offset: 2px;
+}
+
+/* --- Accessibility --- */
+@media (prefers-reduced-motion: reduce) {
+    .login-container,
+    .register-card {
+        animation: none;
+    }
+    
+    .btn-login:hover,
+    .btn-signup:hover,
+    .btn-google:hover {
+        transform: none;
+    }
+}
+
+/* Header styles */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #2c3e50 !important;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #fff !important;
+}
+
+/* Main content */
+.main-content {
+    min-height: calc(100vh - 76px);
+    padding: 2rem 0;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: bold;
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: #27ae60;
+    border-color: #27ae60;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+/* Form styles */
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+/* Map styles */
+.map-container {
+    height: 400px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.map-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-size: 1.1rem;
+    border: 2px dashed #dee2e6;
+}
+
+/* Parking spot styles */
+.parking-spot {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.parking-spot:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.parking-spot.available {
+    border-left: 4px solid #27ae60;
+}
+
+.parking-spot.occupied {
+    border-left: 4px solid #e74c3c;
+}
+
+.parking-spot h5 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.parking-spot .price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.parking-spot .distance {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Status indicators */
+.status-available {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.status-occupied {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* History table styles */
+.table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table thead th {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Profile styles */
+.profile-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #3498db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+}
+
+/* Alert styles */
+.alert {
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+}
+
+/* Loading spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3em;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem 0;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .parking-spot {
+        padding: 0.75rem;
+    }
+}
+
+/* Utility classes */
+.text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+}
+
+.rounded {
+    border-radius: 0.375rem;
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
