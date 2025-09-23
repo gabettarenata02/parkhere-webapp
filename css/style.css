@@ -1252,6 +1252,19 @@ body {
     }
 }
 
+/* Availability Tag */
+.availability-tag {
+    background-color: #F2C84F;
+    color: #000000;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+}
+
 /* Main Content */
 .home-main {
     flex: 1;

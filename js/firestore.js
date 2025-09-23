@@ -20,6 +20,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Parking Location Functions
+export async function getParkingLocations(category) {
+    try {
+        console.log('Fetching parking locations from Firestore for category:', category);
+        
+        const parkingLocationsRef = collection(db, 'parkingLocations');
+        const q = query(parkingLocationsRef, where("availableFor", "array-contains", category));
+        const querySnapshot = await getDocs(q);
+        
+        const locations = [];
+        querySnapshot.forEach((doc) => {
+            locations.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        console.log('Found parking locations for', category, ':', locations);
+        return locations;
+    } catch (error) {
+        console.error('Error fetching parking locations:', error);
+        
+        // If it's a permissions error, provide helpful message
+        if (error.code === 'permission-denied') {
+            throw new Error('Permission denied. Please check your Firestore security rules and ensure you are authenticated.');
+        }
+        
+        // Return empty array on error
+        return [];
+    }
+}
+
 // Vehicle Management Functions
 export async function addVehicle(userId, vehicleData) {
     try {

@@ -24,11 +24,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="location-info d-flex align-items-center">
                                 <i class="ph ph-map-pin me-2"></i>
-                                <span>Pondok Labu, Jakarta Selatan</span>
-                            </div>
-                            <div class="header-actions d-flex align-items-center">
-                                <i class="ph ph-eye me-3"></i>
-                                <i class="ph ph-question"></i>
+                                <span>Parking Spots at UPNVJ</span>
                             </div>
                         </div>
                     </div>
@@ -81,11 +77,11 @@
                     <section class="category-section mb-4">
                         <h2 class="section-title">Category</h2>
                         <div class="category-buttons">
-                            <button class="btn btn-category active" data-vehicle="car">
+                            <button class="btn btn-category active" id="car-category-btn" data-vehicle="car">
                                 <i class="ph ph-car me-2"></i>
                                 Car
                             </button>
-                            <button class="btn btn-category" data-vehicle="motorcycle">
+                            <button class="btn btn-category" id="motorcycle-category-btn" data-vehicle="motorcycle">
                                 <i class="ph ph-motorcycle me-2"></i>
                                 Motorcycle
                             </button>
@@ -95,7 +91,7 @@
                     <!-- Spot near you -->
                     <section class="spots-section mb-4">
                         <h2 class="section-title">Spot near you</h2>
-                        <div class="parking-spots-list">
+                        <div class="parking-spots-list" id="spot-list-container">
                             <!-- Parking Spot Card 1 -->
                             <div class="parking-spot-card">
                                 <div class="spot-image">
@@ -212,14 +208,7 @@
     <script type="module" src="js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Category selection
-            const categoryButtons = document.querySelectorAll('.btn-category');
-            categoryButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    categoryButtons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
+            // Category selection is now handled in main.js
 
             // Add vehicle button
             const addVehicleBtn = document.getElementById('addVehicleBtn');

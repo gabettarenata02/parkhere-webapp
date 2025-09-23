@@ -2,13 +2,14 @@
 console.log('ParkHere main.js loaded');
 
 // Import Firestore functions
-import { addVehicle, getUserVehicles, setActiveVehicle } from './firestore.js';
+import { addVehicle, getUserVehicles, setActiveVehicle, getParkingLocations } from './firestore.js';
 import { showToast, showPopup, parseFirebaseError } from './ui.js';
 import { getCurrentUser } from './auth.js';
 
 // Global variables
 let currentUser = null;
 let parkingData = [];
+let selectedCategory = 'Car'; // Track current filter category
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
@@ -147,6 +148,12 @@ async function initializeHomePage() {
                 updateVehicleDisplay(activeVehicle);
             }
         }
+        
+        // Display parking spots
+        await displayParkingSpots();
+        
+        // Initialize category filter buttons
+        initializeCategoryFilters();
     } catch (error) {
         console.error('Error loading vehicles for home page:', error);
         showToast('error', 'Failed to load vehicle information');
@@ -165,6 +172,166 @@ function updateVehicleDisplay(vehicle) {
     if (vehiclePlate) {
         vehiclePlate.textContent = vehicle.licensePlate;
         vehiclePlate.className = 'vehicle-plate text-uppercase-custom';
+    }
+}
+
+// Display parking spots on home page
+async function displayParkingSpots() {
+    console.log('Displaying parking spots');
+    
+    const container = document.getElementById('spot-list-container');
+    if (!container) {
+        console.log('Parking spots container not found');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-white">Loading parking spots...</p>
+            </div>
+        `;
+        
+        // Fetch parking locations from Firestore with current category filter
+        const parkingLocations = await getParkingLocations(selectedCategory);
+        
+        // Clear container
+        container.innerHTML = '';
+        
+        if (parkingLocations.length === 0) {
+            // Show empty state
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="ph ph-parking" style="font-size: 3rem; color: #A0A0A0; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #FFFFFF; margin-bottom: 0.5rem;">No Parking Spots Found</h3>
+                    <p style="color: #A0A0A0;">There are no parking locations available at the moment.</p>
+                </div>
+            `;
+        } else {
+            // Render parking spot cards
+            parkingLocations.forEach(location => {
+                const card = createParkingSpotCard(location);
+                container.appendChild(card);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error displaying parking spots:', error);
+        
+        // Show error state
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="ph ph-warning-circle" style="font-size: 3rem; color: #F2C84F; margin-bottom: 1rem;"></i>
+                <h3 style="color: #FFFFFF; margin-bottom: 0.5rem;">Failed to Load Parking Spots</h3>
+                <p style="color: #A0A0A0; margin-bottom: 2rem;">There was an error loading parking locations. Please try again.</p>
+                <button class="btn btn-primary-yellow" onclick="location.reload()">
+                    <i class="ph ph-arrow-clockwise me-2"></i>
+                    Try Again
+                </button>
+            </div>
+        `;
+        
+        showToast('error', 'Failed to load parking spots');
+    }
+}
+
+// Create parking spot card element
+function createParkingSpotCard(location) {
+    const card = document.createElement('div');
+    card.className = 'spot-card mb-3 p-3 rounded';
+    card.style.cssText = 'background-color: #2C2C2C; cursor: pointer; transition: all 0.3s ease;';
+    card.setAttribute('data-id', location.id);
+    
+    // Add hover effect
+    card.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#3A3A3A';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#2C2C2C';
+    });
+    
+    // Format price
+    const formattedPrice = location.pricePerDay ? `Rp${location.pricePerDay.toLocaleString()}/day` : 'Price not available';
+    
+    // Get slots data for the selected category
+    const categoryKey = selectedCategory.toLowerCase();
+    const slotsData = location.slots && location.slots[categoryKey] ? location.slots[categoryKey] : { available: 0, total: 0 };
+    const availableSlots = slotsData.available || 0;
+    const totalSlots = slotsData.total || 0;
+    
+    // Create card content
+    card.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="spot-image-placeholder me-3">
+                        <i class="ph ph-parking" style="font-size: 1.5rem; color: #A0A0A0;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 text-white">${location.name || 'Parking Location'}</h5>
+                        <p class="mb-0 text-white" style="font-size: 0.9rem; font-weight: 600;">${formattedPrice}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="availability-tag">
+                    ${availableSlots} / ${totalSlots} available
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add click event listener
+    card.addEventListener('click', function() {
+        const locationId = this.dataset.id;
+        console.log('Parking location clicked:', locationId);
+        window.location.href = `detail-parkir.html?id=${locationId}`;
+    });
+    
+    return card;
+}
+
+// Initialize category filter buttons
+function initializeCategoryFilters() {
+    console.log('Initializing category filters');
+    
+    // Get category buttons
+    const carButton = document.getElementById('car-category-btn');
+    const motorcycleButton = document.getElementById('motorcycle-category-btn');
+    
+    // Car button click listener
+    if (carButton) {
+        carButton.addEventListener('click', async function() {
+            console.log('Car category selected');
+            selectedCategory = 'Car';
+            
+            // Update UI
+            carButton.classList.add('active');
+            if (motorcycleButton) motorcycleButton.classList.remove('active');
+            
+            // Refresh parking spots
+            await displayParkingSpots();
+        });
+    }
+    
+    // Motorcycle button click listener
+    if (motorcycleButton) {
+        motorcycleButton.addEventListener('click', async function() {
+            console.log('Motorcycle category selected');
+            selectedCategory = 'Motorcycle';
+            
+            // Update UI
+            motorcycleButton.classList.add('active');
+            if (carButton) carButton.classList.remove('active');
+            
+            // Refresh parking spots
+            await displayParkingSpots();
+        });
     }
 }
 
