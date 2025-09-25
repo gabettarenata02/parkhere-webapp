@@ -74,6 +74,9 @@ async function initializePage(page) {
             case 'home':
                 await initializeHomePage();
                 break;
+            case 'notification':
+                await initializeNotificationsPage();
+                break;
             case 'add-vehicle':
                 await initializeAddVehiclePage();
                 break;
@@ -200,7 +203,32 @@ async function displayParkingSpots() {
         `;
         
         // Fetch parking locations from Firestore with current category filter
-        const parkingLocations = await getParkingLocations(selectedCategory);
+        let parkingLocations = await getParkingLocations(selectedCategory);
+        
+        // Filter to only the allowed on-campus spots as requested
+        const allowedNames = [
+            'Parkir APU',
+            'Parkir Lapangan Wahidin',
+            'Parkir Kantin',
+            'Parkir FEB'
+        ];
+        parkingLocations = (parkingLocations || []).filter(loc => allowedNames.includes((loc.name || '').trim()))
+            .map(loc => ({ ...loc, name: (loc.name || '').trim() }));
+
+        // Ensure the UI shows all four allowed spots. If any are missing from Firestore,
+        // add placeholder entries so the list is complete for the demo.
+        const existingByName = new Map(parkingLocations.map(l => [l.name, l]));
+        const placeholderByName = {
+            'Parkir APU': { name: 'Parkir APU', pricePerDay: 3000, slots: { car: { available: 60, total: 100 } } },
+            'Parkir Lapangan Wahidin': { name: 'Parkir Lapangan Wahidin', pricePerDay: 3000, slots: { car: { available: 80, total: 100 } } },
+            'Parkir Kantin': { name: 'Parkir Kantin', pricePerDay: 3000, slots: { car: { available: 40, total: 80 } } },
+            'Parkir FEB': { name: 'Parkir FEB', pricePerDay: 3000, slots: { car: { available: 50, total: 90 } } }
+        };
+        allowedNames.forEach(n => {
+            if (!existingByName.has(n)) {
+                parkingLocations.push(placeholderByName[n]);
+            }
+        });
         
         // Clear container
         container.innerHTML = '';
@@ -259,7 +287,7 @@ function createParkingSpotCard(location) {
     });
     
     // Format price
-    const formattedPrice = location.pricePerDay ? `Rp${location.pricePerDay.toLocaleString()}/day` : 'Price not available';
+    const formattedPrice = location.pricePerDay ? `Rp${location.pricePerDay.toLocaleString()}/day` : 'Rp3,000/day';
     
     // Get slots data for the selected category
     const categoryKey = selectedCategory.toLowerCase();
@@ -292,8 +320,10 @@ function createParkingSpotCard(location) {
     // Add click event listener
     card.addEventListener('click', function() {
         const locationId = this.dataset.id;
-        console.log('Parking location clicked:', locationId);
-        window.location.href = `detail-parkir.html?id=${locationId}`;
+        if (locationId) {
+            console.log('Parking location clicked:', locationId);
+            window.location.href = `detail-parkir.html?id=${locationId}`;
+        }
     });
     
     return card;
@@ -335,6 +365,110 @@ function initializeCategoryFilters() {
             // Refresh parking spots
             await displayParkingSpots();
         });
+    }
+}
+
+// Notifications page initialization
+async function initializeNotificationsPage() {
+    console.log('Initializing notifications page');
+    try {
+        if (!currentUser) {
+            console.log('No user authenticated for notifications page');
+            return;
+        }
+
+        // Demo data (campus-only). Later, fetch from Firestore if needed.
+        const notifications = [
+            { id: 1, app: 'Parkhere', message: 'Hey Amy, your parking at Parkir Lapangan Wahidin is confirmed.', time: 'Today, 5 PM', read: false, href: 'detail-parkir.html' },
+            { id: 2, app: 'Parkhere', message: 'Ticket generated for Parkir APU. Show it at the entrance.', time: 'Today, 3 PM', read: true, href: 'tiket.html' },
+            { id: 3, app: 'Parkhere', message: 'Payment received for Parkir FEB.', time: 'Yesterday, 9 PM', read: true, href: 'pembayaran.html' },
+            { id: 4, app: 'Parkhere', message: 'Spot near you: Parkir Kantin has new availability.', time: 'Yesterday, 2 PM', read: false, href: 'home.html' }
+        ];
+
+        const listEl = document.getElementById('notification-list');
+        const allTab = document.getElementById('tab-all');
+        const unreadTab = document.getElementById('tab-unread');
+
+        if (!listEl || !allTab || !unreadTab) {
+            console.log('Notification elements not found');
+            return;
+        }
+
+        function render(list) {
+            listEl.innerHTML = '';
+            list.forEach(n => {
+                const card = document.createElement('div');
+                card.className = 'notification-card';
+
+                const icon = document.createElement('div');
+                icon.className = 'notif-icon';
+                icon.textContent = (n.app && n.app[0]) ? n.app[0] : 'P';
+
+                const content = document.createElement('div');
+                content.className = 'notif-content';
+
+                const top = document.createElement('div');
+                top.className = 'notif-top';
+
+                const title = document.createElement('h4');
+                title.className = 'notif-title';
+                title.textContent = n.app || 'Notification';
+                if (!n.read) {
+                    const dot = document.createElement('span');
+                    dot.className = 'unread-dot';
+                    title.appendChild(dot);
+                }
+
+                const time = document.createElement('div');
+                time.className = 'notif-time';
+                time.textContent = n.time;
+
+                top.appendChild(title);
+                top.appendChild(time);
+
+                const message = document.createElement('p');
+                message.className = 'notif-message';
+                message.textContent = n.message;
+
+                const actions = document.createElement('div');
+                actions.className = 'notif-actions';
+                const link = document.createElement('a');
+                link.href = n.href || '#';
+                link.textContent = 'See more';
+                actions.appendChild(link);
+
+                content.appendChild(top);
+                content.appendChild(message);
+                content.appendChild(actions);
+
+                card.appendChild(icon);
+                card.appendChild(content);
+
+                listEl.appendChild(card);
+            });
+        }
+
+        function setActive(tab) {
+            [allTab, unreadTab].forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        }
+
+        allTab.addEventListener('click', () => {
+            setActive(allTab);
+            render(notifications);
+        });
+
+        unreadTab.addEventListener('click', () => {
+            setActive(unreadTab);
+            render(notifications.filter(n => !n.read));
+        });
+
+        // Initial render (All)
+        setActive(allTab);
+        render(notifications);
+    } catch (error) {
+        console.error('Error initializing notifications page:', error);
+        showToast('error', 'Failed to load notifications');
     }
 }
 
