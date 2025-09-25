@@ -3,14 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParkHere - Parking Details</title>
+    <title>ParkHere - Parking Detail</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-    <h1>Parking Details</h1>
+<body class="detail-body">
+    <!-- Main Container -->
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <!-- Header Section -->
+                <header class="detail-header">
+                    <div class="d-flex align-items-center mb-4">
+                        <button class="btn btn-back me-3" onclick="history.back()">
+                            <i class="ph ph-arrow-left"></i>
+                        </button>
+                        <h2 id="location-name" class="mb-0">Loading...</h2>
+                    </div>
+                </header>
+
+                <!-- Image Placeholder -->
+                <div class="detail-image-placeholder mb-4">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <i class="ph ph-parking" style="font-size: 3rem; color: #A0A0A0;"></i>
+                    </div>
+                </div>
+
+                <!-- Information Section -->
+                <section class="detail-info mb-4">
+                    <!-- Availability Display -->
+                    <div class="availability-section text-center mb-4">
+                        <h1 id="available-slots-display" class="availability-display">-- / --</h1>
+                        <p class="availability-label">Available Slots</p>
+                    </div>
+
+                    <!-- Information List -->
+                    <div class="info-list">
+                        <div class="info-row d-flex align-items-center mb-3">
+                            <i class="ph ph-money me-3" style="color: #F2C84F; font-size: 1.2rem;"></i>
+                            <span id="price-display" class="info-text">Loading price...</span>
+                        </div>
+                        
+                        <div class="info-row d-flex align-items-center mb-3">
+                            <i class="ph ph-map-trifold me-3" style="color: #F2C84F; font-size: 1.2rem;"></i>
+                            <a href="#" class="info-link" id="map-link">View on Map</a>
+                        </div>
+                        
+                        <div class="info-row d-flex align-items-center mb-3">
+                            <i class="ph ph-info me-3" style="color: #F2C84F; font-size: 1.2rem;"></i>
+                            <span class="info-text" id="additional-notes">Additional information will be displayed here</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Action Button -->
+                <div class="action-section">
+                    <button class="btn btn-primary-yellow w-100 py-3" id="start-parking-button">
+                        <i class="ph ph-play me-2"></i>
+                        Start Parking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/map.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

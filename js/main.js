@@ -2,7 +2,7 @@
 console.log('ParkHere main.js loaded');
 
 // Import Firestore functions
-import { addVehicle, getUserVehicles, setActiveVehicle, getParkingLocations } from './firestore.js';
+import { addVehicle, getUserVehicles, setActiveVehicle, getParkingLocations, getParkingLocationById } from './firestore.js';
 import { showToast, showPopup, parseFirebaseError } from './ui.js';
 import { getCurrentUser } from './auth.js';
 
@@ -79,6 +79,9 @@ async function initializePage(page) {
                 break;
             case 'vehicle-list':
                 await initializeVehicleListPage();
+                break;
+            case 'detail-parkir':
+                await initializeDetailPage();
                 break;
             default:
                 console.log('No specific initialization for page:', page);
@@ -331,6 +334,121 @@ function initializeCategoryFilters() {
             
             // Refresh parking spots
             await displayParkingSpots();
+        });
+    }
+}
+
+// Detail page initialization
+async function initializeDetailPage() {
+    console.log('Initializing detail page');
+    
+    try {
+        // Get the location ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const locationId = urlParams.get('id');
+        
+        if (!locationId) {
+            console.log('No location ID found in URL');
+            showToast('error', 'Invalid parking location');
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 2000);
+            return;
+        }
+        
+        console.log('Loading parking location:', locationId);
+        
+        // Show loading state
+        updateDetailPageLoadingState();
+        
+        // Fetch parking location data
+        const locationData = await getParkingLocationById(locationId);
+        
+        if (!locationData) {
+            console.log('Parking location not found');
+            showToast('error', 'Parking location not found');
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 2000);
+            return;
+        }
+        
+        // Render the parking location data
+        renderParkingLocationDetail(locationData);
+        
+        // Add event listener for start parking button
+        addStartParkingListener();
+        
+    } catch (error) {
+        console.error('Error initializing detail page:', error);
+        showToast('error', 'Failed to load parking details');
+        setTimeout(() => {
+            window.location.href = 'home.html';
+        }, 2000);
+    }
+}
+
+// Update detail page loading state
+function updateDetailPageLoadingState() {
+    const locationName = document.getElementById('location-name');
+    const availableSlots = document.getElementById('available-slots-display');
+    const priceDisplay = document.getElementById('price-display');
+    
+    if (locationName) locationName.textContent = 'Loading...';
+    if (availableSlots) availableSlots.textContent = '-- / --';
+    if (priceDisplay) priceDisplay.textContent = 'Loading price...';
+}
+
+// Render parking location detail data
+function renderParkingLocationDetail(locationData) {
+    console.log('Rendering parking location detail:', locationData);
+    
+    // Update location name
+    const locationName = document.getElementById('location-name');
+    if (locationName) {
+        locationName.textContent = locationData.name || 'Parking Location';
+    }
+    
+    // Update availability display
+    const availableSlots = document.getElementById('available-slots-display');
+    if (availableSlots) {
+        // For now, show total available slots (we'll enhance this later with category filtering)
+        const totalAvailable = locationData.totalSlots || 0;
+        const totalSlots = locationData.totalSlots || 0;
+        availableSlots.textContent = `${totalAvailable} / ${totalSlots}`;
+    }
+    
+    // Update price display
+    const priceDisplay = document.getElementById('price-display');
+    if (priceDisplay) {
+        const formattedPrice = locationData.pricePerDay ? 
+            `Rp${locationData.pricePerDay.toLocaleString()}/day` : 
+            'Price not available';
+        priceDisplay.textContent = formattedPrice;
+    }
+    
+    // Update additional notes
+    const additionalNotes = document.getElementById('additional-notes');
+    if (additionalNotes) {
+        additionalNotes.textContent = locationData.description || 
+            'This parking location is available for use. Please follow all parking regulations.';
+    }
+    
+    // Update map link (placeholder for now)
+    const mapLink = document.getElementById('map-link');
+    if (mapLink) {
+        mapLink.href = '#'; // Will be implemented later with actual map integration
+    }
+}
+
+// Add start parking button event listener
+function addStartParkingListener() {
+    const startParkingButton = document.getElementById('start-parking-button');
+    
+    if (startParkingButton) {
+        startParkingButton.addEventListener('click', function() {
+            console.log('Start parking button clicked');
+            showToast('success', 'Check-in successful! (Demo)');
         });
     }
 }

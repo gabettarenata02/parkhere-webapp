@@ -1265,6 +1265,111 @@ body {
     min-width: 80px;
 }
 
+/* Detail Page Styles */
+.detail-body {
+    background-color: #1E1E1E;
+    min-height: 100vh;
+    color: #FFFFFF;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.detail-header {
+    background-color: #1E1E1E;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.detail-header h2 {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.btn-back {
+    background-color: #2C2C2C;
+    border: none;
+    color: #FFFFFF;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background-color: #3A3A3A;
+    color: #F2C84F;
+}
+
+.detail-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #2C2C2C;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.availability-section {
+    background-color: #2C2C2C;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.availability-display {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #F2C84F;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.availability-label {
+    color: #A0A0A0;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.info-list {
+    background-color: #2C2C2C;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.info-row {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #3A3A3A;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-text {
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.info-link {
+    color: #F2C84F;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.info-link:hover {
+    color: #E6B847;
+    text-decoration: underline;
+}
+
+.action-section {
+    padding: 1rem 0 2rem 0;
+}
+
 /* Main Content */
 .home-main {
     flex: 1;

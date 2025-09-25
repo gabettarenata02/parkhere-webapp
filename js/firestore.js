@@ -3,7 +3,7 @@ console.log('ParkHere firestore.js loaded');
 
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js';
-import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc, writeBatch, getDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -49,6 +49,37 @@ export async function getParkingLocations(category) {
         
         // Return empty array on error
         return [];
+    }
+}
+
+export async function getParkingLocationById(locationId) {
+    try {
+        console.log('Fetching parking location by ID:', locationId);
+        
+        const locationRef = doc(db, 'parkingLocations', locationId);
+        const locationSnap = await getDoc(locationRef);
+        
+        if (locationSnap.exists()) {
+            const locationData = {
+                id: locationSnap.id,
+                ...locationSnap.data()
+            };
+            console.log('Found parking location:', locationData);
+            return locationData;
+        } else {
+            console.log('No parking location found with ID:', locationId);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching parking location by ID:', error);
+        
+        // If it's a permissions error, provide helpful message
+        if (error.code === 'permission-denied') {
+            throw new Error('Permission denied. Please check your Firestore security rules and ensure you are authenticated.');
+        }
+        
+        // Return null on error
+        return null;
     }
 }
 
