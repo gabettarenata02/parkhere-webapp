@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkHere - Notifications</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+</head>
+<body class="home-body">
+    <main class="container notification-container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <header class="notification-header">
+                    <h1 class="notification-title">Notifications</h1>
+                    <div class="tabs">
+                        <button id="tab-all" class="tab-btn">All</button>
+                        <button id="tab-unread" class="tab-btn">Unread</button>
+                    </div>
+                </header>
+
+                <section class="mb-4">
+                    <div id="notification-list" class="notification-list"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item">
+            <a href="home.html" class="nav-link">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="riwayat.html" class="nav-link">
+                <i class="ph ph-receipt"></i>
+                <span>Transaction</span>
+            </a>
+        </div>
+        <div class="nav-item nav-scan">
+            <a href="#" class="nav-link nav-scan-btn">
+                <i class="ph ph-qr-code"></i>
+                <span>Scan</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="notification.html" class="nav-link active">
+                <i class="ph ph-bell"></i>
+                <span>Notification</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="profile.html" class="nav-link">
+                <i class="ph ph-user-circle"></i>
+                <span>Account</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
+
