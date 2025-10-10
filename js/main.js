@@ -2,7 +2,7 @@
 console.log('ParkHere main.js loaded');
 
 // Import Firestore functions
-import { addVehicle, getUserVehicles, setActiveVehicle, getParkingLocations, getParkingLocationById } from './firestore.js';
+import { addVehicle, getUserVehicles, setActiveVehicle, getParkingLocations, getParkingLocationById, startParkingSession, getActiveParkingTicket, getVehicleById } from './firestore.js';
 import { showToast, showPopup, parseFirebaseError } from './ui.js';
 import { getCurrentUser } from './auth.js';
 
@@ -10,6 +10,10 @@ import { getCurrentUser } from './auth.js';
 let currentUser = null;
 let parkingData = [];
 let selectedCategory = 'Car'; // Track current filter category
+let parkingTimer = null; // Track the timer interval
+
+// Google Maps API Key (for production, store this securely in environment variables)
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDLaI2cD-47gGjqsSdQElgIh197SdAnaLQ';
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
@@ -86,6 +90,9 @@ async function initializePage(page) {
             case 'detail-parkir':
                 await initializeDetailPage();
                 break;
+            case 'tiket':
+                await initializeTicketPage();
+                break;
             default:
                 console.log('No specific initialization for page:', page);
         }
@@ -160,6 +167,9 @@ async function initializeHomePage() {
         
         // Initialize category filter buttons
         initializeCategoryFilters();
+        
+        // Handle geolocation
+        handleGeolocation();
     } catch (error) {
         console.error('Error loading vehicles for home page:', error);
         showToast('error', 'Failed to load vehicle information');
@@ -179,6 +189,107 @@ function updateVehicleDisplay(vehicle) {
         vehiclePlate.textContent = vehicle.licensePlate;
         vehiclePlate.className = 'vehicle-plate text-uppercase-custom';
     }
+}
+
+// Handle geolocation for home page
+async function handleGeolocation() {
+    console.log('Handling geolocation');
+    
+    // Check if geolocation is supported
+    if (!("geolocation" in navigator)) {
+        console.log('Geolocation is not supported by this browser');
+        showToast('error', 'Geolocation is not supported by your browser');
+        return;
+    }
+    
+    // Get current position
+    navigator.geolocation.getCurrentPosition(
+        // Success callback
+        async function(position) {
+            console.log('Geolocation success:', position);
+            
+            try {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                
+                console.log('User coordinates:', latitude, longitude);
+                
+                // Create geocoder instance
+                const geocoder = new google.maps.Geocoder();
+                
+                // Perform reverse geocoding
+                geocoder.geocode({
+                    location: { lat: latitude, lng: longitude }
+                }, function(results, status) {
+                    if (status === 'OK' && results[0]) {
+                        console.log('Geocoding results:', results);
+                        
+                        // Get a suitable address
+                        let address = results[0].formatted_address;
+                        
+                        // Try to get a more specific address (like sublocality)
+                        const result = results[0];
+                        if (result.address_components) {
+                            for (let component of result.address_components) {
+                                if (component.types.includes('sublocality') || 
+                                    component.types.includes('locality') ||
+                                    component.types.includes('administrative_area_level_2')) {
+                                    address = component.long_name;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Update location text
+                        const locationText = document.getElementById('location-text');
+                        if (locationText) {
+                            locationText.textContent = address;
+                            console.log('Updated location text to:', address);
+                        }
+                        
+                        showToast('success', 'Location updated successfully');
+                        
+                    } else {
+                        console.error('Geocoding failed:', status);
+                        showToast('error', 'Failed to get address from location');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error processing geolocation:', error);
+                showToast('error', 'Failed to process location data');
+            }
+        },
+        // Error callback
+        function(error) {
+            console.error('Geolocation error:', error);
+            
+            let errorMessage = 'Failed to get your location';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = 'Location access denied. Please allow location access to get your current address.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = 'Location information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = 'Location request timed out.';
+                    break;
+                default:
+                    errorMessage = 'An unknown error occurred while retrieving location.';
+                    break;
+            }
+            
+            showToast('error', errorMessage);
+        },
+        // Options
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutes
+        }
+    );
 }
 
 // Display parking spots on home page
@@ -507,11 +618,27 @@ async function initializeDetailPage() {
             return;
         }
         
-        // Render the parking location data
-        renderParkingLocationDetail(locationData);
+        // Get user's active vehicle to determine vehicle type
+        const vehicles = await getUserVehicles(currentUser.uid);
+        const activeVehicle = vehicles.find(v => v.isActive) || vehicles[0];
+        
+        if (!activeVehicle) {
+            console.log('No active vehicle found');
+            showToast('error', 'Please add a vehicle first');
+            setTimeout(() => {
+                window.location.href = 'add-vehicle.html';
+            }, 2000);
+            return;
+        }
+        
+        // Render the parking location data with vehicle-specific slot counts
+        renderParkingLocationDetail(locationData, activeVehicle);
+        
+        // Load static map image
+        loadStaticMap(locationData);
         
         // Add event listener for start parking button
-        addStartParkingListener();
+        addStartParkingListener(locationId, activeVehicle.id);
         
     } catch (error) {
         console.error('Error initializing detail page:', error);
@@ -525,17 +652,19 @@ async function initializeDetailPage() {
 // Update detail page loading state
 function updateDetailPageLoadingState() {
     const locationName = document.getElementById('location-name');
-    const availableSlots = document.getElementById('available-slots-display');
+    const availableSlots = document.getElementById('available-slots');
+    const totalSlots = document.getElementById('total-slots');
     const priceDisplay = document.getElementById('price-display');
     
     if (locationName) locationName.textContent = 'Loading...';
-    if (availableSlots) availableSlots.textContent = '-- / --';
-    if (priceDisplay) priceDisplay.textContent = 'Loading price...';
+    if (availableSlots) availableSlots.textContent = '--';
+    if (totalSlots) totalSlots.textContent = '--';
+    if (priceDisplay) priceDisplay.textContent = '--';
 }
 
 // Render parking location detail data
-function renderParkingLocationDetail(locationData) {
-    console.log('Rendering parking location detail:', locationData);
+function renderParkingLocationDetail(locationData, activeVehicle) {
+    console.log('Rendering parking location detail:', locationData, 'for vehicle:', activeVehicle);
     
     // Update location name
     const locationName = document.getElementById('location-name');
@@ -543,13 +672,17 @@ function renderParkingLocationDetail(locationData) {
         locationName.textContent = locationData.name || 'Parking Location';
     }
     
-    // Update availability display
-    const availableSlots = document.getElementById('available-slots-display');
-    if (availableSlots) {
-        // For now, show total available slots (we'll enhance this later with category filtering)
-        const totalAvailable = locationData.totalSlots || 0;
-        const totalSlots = locationData.totalSlots || 0;
-        availableSlots.textContent = `${totalAvailable} / ${totalSlots}`;
+    // Update availability display based on vehicle type
+    const availableSlots = document.getElementById('available-slots');
+    const totalSlots = document.getElementById('total-slots');
+    
+    if (availableSlots && totalSlots) {
+        const vehicleType = activeVehicle.vehicleType.toLowerCase();
+        const slotsData = locationData.slots && locationData.slots[vehicleType] ? 
+            locationData.slots[vehicleType] : { available: 0, total: 0 };
+        
+        availableSlots.textContent = slotsData.available || 0;
+        totalSlots.textContent = slotsData.total || 0;
     }
     
     // Update price display
@@ -560,29 +693,253 @@ function renderParkingLocationDetail(locationData) {
             'Price not available';
         priceDisplay.textContent = formattedPrice;
     }
+}
+
+// Load static map image for detail page
+function loadStaticMap(locationData) {
+    console.log('Loading static map for location:', locationData);
     
-    // Update additional notes
-    const additionalNotes = document.getElementById('additional-notes');
-    if (additionalNotes) {
-        additionalNotes.textContent = locationData.description || 
-            'This parking location is available for use. Please follow all parking regulations.';
-    }
-    
-    // Update map link (placeholder for now)
-    const mapLink = document.getElementById('map-link');
-    if (mapLink) {
-        mapLink.href = '#'; // Will be implemented later with actual map integration
+    try {
+        // Check if location has coordinates
+        if (!locationData.location || !locationData.location.latitude || !locationData.location.longitude) {
+            console.log('No coordinates available for this location');
+            return;
+        }
+        
+        const latitude = locationData.location.latitude;
+        const longitude = locationData.location.longitude;
+        
+        console.log('Location coordinates:', latitude, longitude);
+        
+        // Construct the static map URL
+        const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?` +
+            `center=${latitude},${longitude}&` +
+            `zoom=17&` +
+            `size=600x300&` +
+            `maptype=roadmap&` +
+            `markers=color:red%7C${latitude},${longitude}&` +
+            `key=${GOOGLE_MAPS_API_KEY}`;
+        
+        console.log('Static map URL:', staticMapUrl);
+        
+        // Find the image placeholder element
+        const imagePlaceholder = document.getElementById('detail-image-placeholder');
+        if (imagePlaceholder) {
+            // Set the background image
+            imagePlaceholder.style.backgroundImage = `url(${staticMapUrl})`;
+            imagePlaceholder.style.backgroundSize = 'cover';
+            imagePlaceholder.style.backgroundPosition = 'center';
+            imagePlaceholder.style.backgroundRepeat = 'no-repeat';
+            
+            // Hide the placeholder icon since we now have a map
+            const placeholderIcon = imagePlaceholder.querySelector('i');
+            if (placeholderIcon) {
+                placeholderIcon.style.display = 'none';
+            }
+            
+            console.log('Static map loaded successfully');
+        } else {
+            console.log('Image placeholder element not found');
+        }
+        
+    } catch (error) {
+        console.error('Error loading static map:', error);
+        showToast('error', 'Failed to load map image');
     }
 }
 
 // Add start parking button event listener
-function addStartParkingListener() {
+function addStartParkingListener(locationId, vehicleId) {
     const startParkingButton = document.getElementById('start-parking-button');
     
     if (startParkingButton) {
-        startParkingButton.addEventListener('click', function() {
+        startParkingButton.addEventListener('click', async function() {
             console.log('Start parking button clicked');
-            showToast('success', 'Check-in successful! (Demo)');
+            
+            try {
+                // Show loading popup
+                showPopup('info', 'Starting session...', 'Please wait while we start your parking session.', null);
+                
+                // Start the parking session
+                const ticketId = await startParkingSession(currentUser.uid, vehicleId, locationId);
+                
+                console.log('Parking session started successfully:', ticketId);
+                
+                // Show success toast
+                showToast('success', 'Session Started!');
+                
+                // Redirect to ticket page
+                setTimeout(() => {
+                    window.location.href = `tiket.html?id=${ticketId}`;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error starting parking session:', error);
+                const friendlyError = parseFirebaseError(error);
+                showToast('error', friendlyError);
+            }
+        });
+    }
+}
+
+// Ticket page initialization
+async function initializeTicketPage() {
+    console.log('Initializing ticket page');
+    
+    try {
+        // Get current user
+        if (!currentUser) {
+            console.log('No user authenticated for ticket page');
+            showToast('error', 'Please log in to view your parking ticket');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+            return;
+        }
+        
+        // Fetch active parking ticket
+        const ticketData = await getActiveParkingTicket(currentUser.uid);
+        
+        if (!ticketData) {
+            console.log('No active parking ticket found');
+            showNoActiveTicketState();
+            return;
+        }
+        
+        // Fetch related data
+        const [locationData, vehicleData] = await Promise.all([
+            getParkingLocationById(ticketData.locationId),
+            getVehicleById(ticketData.vehicleId)
+        ]);
+        
+        // Render ticket information
+        renderTicketData(ticketData, locationData, vehicleData);
+        
+        // Start the timer
+        startParkingTimer(ticketData.startTime);
+        
+        // Add end parking button listener
+        addEndParkingListener(ticketData.id);
+        
+    } catch (error) {
+        console.error('Error initializing ticket page:', error);
+        showToast('error', 'Failed to load parking ticket');
+        setTimeout(() => {
+            window.location.href = 'home.html';
+        }, 2000);
+    }
+}
+
+// Show no active ticket state
+function showNoActiveTicketState() {
+    const container = document.querySelector('.container .row .col-12');
+    if (container) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="ph ph-parking" style="font-size: 4rem; color: #A0A0A0; margin-bottom: 1rem;"></i>
+                <h3 style="color: #FFFFFF; margin-bottom: 0.5rem;">No Active Parking Session</h3>
+                <p style="color: #A0A0A0; margin-bottom: 2rem;">You don't have any active parking sessions.</p>
+                <a href="home.html" class="btn btn-primary-yellow">
+                    <i class="ph ph-house me-2"></i>
+                    Go to Home
+                </a>
+            </div>
+        `;
+    }
+}
+
+
+// Render ticket data
+function renderTicketData(ticketData, locationData, vehicleData) {
+    console.log('Rendering ticket data:', ticketData, locationData, vehicleData);
+    
+    // Update location name
+    const locationName = document.getElementById('ticket-location-name');
+    if (locationName) {
+        locationName.textContent = locationData?.name || 'Unknown Location';
+    }
+    
+    // Update vehicle info
+    const vehicleInfo = document.getElementById('ticket-vehicle-info');
+    if (vehicleInfo) {
+        const vehicleText = vehicleData ? 
+            `${vehicleData.vehicleType} - ${vehicleData.licensePlate}` : 
+            'Unknown Vehicle';
+        vehicleInfo.textContent = vehicleText;
+    }
+    
+    // Update start time
+    const startTime = document.getElementById('ticket-start-time');
+    if (startTime) {
+        const startDate = ticketData.startTime.toDate();
+        const timeString = startDate.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false 
+        });
+        startTime.textContent = `Start time: ${timeString}`;
+    }
+}
+
+// Start the parking timer
+function startParkingTimer(startTime) {
+    console.log('Starting parking timer from:', startTime);
+    
+    const timerElement = document.getElementById('parking-timer');
+    if (!timerElement) return;
+    
+    // Clear any existing timer
+    if (parkingTimer) {
+        clearInterval(parkingTimer);
+    }
+    
+    // Convert Firestore timestamp to JavaScript Date
+    const startDate = startTime.toDate();
+    
+    // Update timer immediately
+    updateTimer(startDate, timerElement);
+    
+    // Update timer every second
+    parkingTimer = setInterval(() => {
+        updateTimer(startDate, timerElement);
+    }, 1000);
+}
+
+// Update timer display
+function updateTimer(startDate, timerElement) {
+    const now = Date.now();
+    const diffMs = now - startDate.getTime();
+    
+    // Convert milliseconds to hours, minutes, seconds
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+    
+    // Format as HH:MM:SS
+    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    timerElement.textContent = timeString;
+}
+
+// Add end parking button listener
+function addEndParkingListener(ticketId) {
+    const endButton = document.getElementById('end-parking-button');
+    
+    if (endButton) {
+        endButton.addEventListener('click', function() {
+            console.log('End parking button clicked');
+            
+            // Stop the timer
+            if (parkingTimer) {
+                clearInterval(parkingTimer);
+                parkingTimer = null;
+            }
+            
+            // Show toast and redirect with ticket ID
+            showToast('success', 'Proceeding to payment...');
+            setTimeout(() => {
+                window.location.href = `pembayaran.html?id=${ticketId}`;
+            }, 1500);
         });
     }
 }

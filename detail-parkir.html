@@ -38,39 +38,35 @@
                 <section class="detail-info mb-4">
                     <!-- Availability Display -->
                     <div class="availability-section text-center mb-4">
-                        <h1 id="available-slots-display" class="availability-display">-- / --</h1>
-                        <p class="availability-label">Available Slots</p>
+                        <p class="text-muted">Available Slots</p>
+                        <h1 id="slots-display" class="slots-display">
+                            <span id="available-slots">--</span> / <span id="total-slots">--</span>
+                        </h1>
                     </div>
 
                     <!-- Information List -->
-                    <div class="info-list">
-                        <div class="info-row d-flex align-items-center mb-3">
+                    <ul class="info-list">
+                        <li class="d-flex align-items-center">
                             <i class="ph ph-money me-3" style="color: #F2C84F; font-size: 1.2rem;"></i>
-                            <span id="price-display" class="info-text">Loading price...</span>
-                        </div>
-                        
-                        <div class="info-row d-flex align-items-center mb-3">
+                            <span id="price-display">--</span>
+                        </li>
+                        <li class="d-flex align-items-center">
                             <i class="ph ph-map-trifold me-3" style="color: #F2C84F; font-size: 1.2rem;"></i>
-                            <a href="#" class="info-link" id="map-link">View on Map</a>
-                        </div>
-                        
-                        <div class="info-row d-flex align-items-center mb-3">
-                            <i class="ph ph-info me-3" style="color: #F2C84F; font-size: 1.2rem;"></i>
-                            <span class="info-text" id="additional-notes">Additional information will be displayed here</span>
-                        </div>
-                    </div>
+                            <span>View on Map</span>
+                        </li>
+                    </ul>
                 </section>
-
-                <!-- Action Button -->
-                <div class="action-section">
-                    <button class="btn btn-primary-yellow w-100 py-3" id="start-parking-button">
-                        <i class="ph ph-play me-2"></i>
-                        Start Parking
-                    </button>
-                </div>
             </div>
         </div>
     </main>
+
+    <!-- Fixed Action Button -->
+    <div class="fixed-action-section">
+        <button class="btn btn-primary-yellow w-100 py-3" id="start-parking-button">
+            <i class="ph ph-play me-2"></i>
+            Start Parking
+        </button>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="js/main.js"></script>

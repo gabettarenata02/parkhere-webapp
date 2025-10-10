@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- MAKE SURE TO REPLACE YOUR_API_KEY with your actual Google Maps API Key -->
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLaI2cD-47gGjqsSdQElgIh197SdAnaLQ&callback=initMap&libraries=geocoding"></script>
 </head>
 <body class="home-body">
     <!-- Main Container -->
@@ -24,7 +26,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="location-info d-flex align-items-center">
                                 <i class="ph ph-map-pin me-2"></i>
-                                <span>Parking Spots at UPNVJ</span>
+                                <span id="location-text">Parking Spots at UPNVJ</span>
                             </div>
                         </div>
                     </div>

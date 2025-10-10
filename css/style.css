@@ -1370,6 +1370,115 @@ body {
     padding: 1rem 0 2rem 0;
 }
 
+/* Enhanced Detail Page Styles */
+.slots-display {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #F2C84F;
+    margin-bottom: 0;
+    line-height: 1;
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: #2C2C2C;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.info-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid #3A3A3A;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+.fixed-action-section {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #1E1E1E;
+    padding: 1rem;
+    border-top: 1px solid #3A3A3A;
+    z-index: 1000;
+}
+
+/* Ticket Page Styles */
+.ticket-body {
+    background-color: #1E1E1E;
+    min-height: 100vh;
+    color: #FFFFFF;
+    font-family: 'Public Sans', sans-serif;
+    padding-bottom: 100px; /* Space for fixed button */
+}
+
+.ticket-header {
+    background-color: #1E1E1E;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.ticket-title {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 0;
+}
+
+.ticket-card {
+    background-color: #2C2C2C;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.ticket-content {
+    color: #FFFFFF;
+}
+
+.ticket-location {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.ticket-vehicle {
+    color: #A0A0A0;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ticket-start-time {
+    color: #A0A0A0;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+.timer-section {
+    margin: 2rem 0;
+}
+
+.parking-timer {
+    font-size: 5rem;
+    font-weight: 700;
+    color: #F2C84F;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(242, 200, 79, 0.3);
+}
+
 /* Main Content */
 .home-main {
     flex: 1;

@@ -3,7 +3,7 @@ console.log('ParkHere firestore.js loaded');
 
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js';
-import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc, writeBatch, getDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc, writeBatch, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -72,6 +72,157 @@ export async function getParkingLocationById(locationId) {
         }
     } catch (error) {
         console.error('Error fetching parking location by ID:', error);
+        
+        // If it's a permissions error, provide helpful message
+        if (error.code === 'permission-denied') {
+            throw new Error('Permission denied. Please check your Firestore security rules and ensure you are authenticated.');
+        }
+        
+        // Return null on error
+        return null;
+    }
+}
+
+export async function startParkingSession(userId, vehicleId, locationId) {
+    try {
+        console.log('Starting parking session:', { userId, vehicleId, locationId });
+        
+        // Use a transaction to ensure data integrity
+        const result = await runTransaction(db, async (transaction) => {
+            // Get the parking location document
+            const locationRef = doc(db, 'parkingLocations', locationId);
+            const locationSnap = await transaction.get(locationRef);
+            
+            if (!locationSnap.exists()) {
+                throw new Error('Parking location not found');
+            }
+            
+            const locationData = locationSnap.data();
+            
+            // Get the vehicle document to determine vehicle type
+            const vehicleRef = doc(db, 'vehicles', vehicleId);
+            const vehicleSnap = await transaction.get(vehicleRef);
+            
+            if (!vehicleSnap.exists()) {
+                throw new Error('Vehicle not found');
+            }
+            
+            const vehicleData = vehicleSnap.data();
+            const vehicleType = vehicleData.vehicleType.toLowerCase(); // 'car' or 'motorcycle'
+            
+            // Check if slots are available for this vehicle type
+            if (!locationData.slots || !locationData.slots[vehicleType]) {
+                throw new Error('No slots available for this vehicle type');
+            }
+            
+            const currentSlots = locationData.slots[vehicleType];
+            if (currentSlots.available <= 0) {
+                throw new Error('No available slots for this vehicle type');
+            }
+            
+            // Create the parking session document
+            const sessionData = {
+                userId: userId,
+                vehicleId: vehicleId,
+                locationId: locationId,
+                startTime: serverTimestamp(),
+                status: 'active',
+                vehicleType: vehicleData.vehicleType,
+                licensePlate: vehicleData.licensePlate,
+                locationName: locationData.name
+            };
+            
+            const sessionRef = doc(collection(db, 'activeParkings'));
+            transaction.set(sessionRef, sessionData);
+            
+            // Decrement the available slots for the vehicle type
+            const updatedSlots = {
+                ...locationData.slots,
+                [vehicleType]: {
+                    ...currentSlots,
+                    available: currentSlots.available - 1
+                }
+            };
+            
+            transaction.update(locationRef, {
+                slots: updatedSlots,
+                updatedAt: serverTimestamp()
+            });
+            
+            return sessionRef.id;
+        });
+        
+        console.log('Parking session started successfully:', result);
+        return result;
+        
+    } catch (error) {
+        console.error('Error starting parking session:', error);
+        
+        // If it's a permissions error, provide helpful message
+        if (error.code === 'permission-denied') {
+            throw new Error('Permission denied. Please check your Firestore security rules and ensure you are authenticated.');
+        }
+        
+        throw error;
+    }
+}
+
+export async function getActiveParkingTicket(userId) {
+    try {
+        console.log('Fetching active parking ticket for user:', userId);
+        
+        const activeParkingsRef = collection(db, 'activeParkings');
+        const q = query(activeParkingsRef, where('userId', '==', userId), where('status', '==', 'active'));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            console.log('No active parking ticket found for user:', userId);
+            return null;
+        }
+        
+        // Get the first (and should be only) document
+        const ticketDoc = querySnapshot.docs[0];
+        const ticketData = {
+            id: ticketDoc.id,
+            ...ticketDoc.data()
+        };
+        
+        console.log('Found active parking ticket:', ticketData);
+        return ticketData;
+        
+    } catch (error) {
+        console.error('Error fetching active parking ticket:', error);
+        
+        // If it's a permissions error, provide helpful message
+        if (error.code === 'permission-denied') {
+            throw new Error('Permission denied. Please check your Firestore security rules and ensure you are authenticated.');
+        }
+        
+        // Return null on error
+        return null;
+    }
+}
+
+export async function getVehicleById(vehicleId) {
+    try {
+        console.log('Fetching vehicle by ID:', vehicleId);
+        
+        const vehicleRef = doc(db, 'vehicles', vehicleId);
+        const vehicleSnap = await getDoc(vehicleRef);
+        
+        if (vehicleSnap.exists()) {
+            const vehicleData = {
+                id: vehicleSnap.id,
+                ...vehicleSnap.data()
+            };
+            console.log('Found vehicle:', vehicleData);
+            return vehicleData;
+        } else {
+            console.log('No vehicle found with ID:', vehicleId);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching vehicle by ID:', error);
         
         // If it's a permissions error, provide helpful message
         if (error.code === 'permission-denied') {
